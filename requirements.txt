@@ -1,0 +1,9 @@
+pypdf
+numpy
+scikit-learn
+sentence-transformers
+faiss-cpu
+fastapi
+streamlit
+python-dotenv
+pytest

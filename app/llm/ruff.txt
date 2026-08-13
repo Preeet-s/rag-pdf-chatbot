@@ -1,0 +1,52 @@
+generator.py
+
+from transformers import pipeline
+
+
+class Generator:
+    def __init__(self):
+        self.pipe = pipeline(
+            "text2text-generation",
+            model="google/flan-t5-base",
+        )
+        self.tokenizer = self.pipe.tokenizer
+
+    def generate(
+        self,
+        question: str,
+        context: str,
+    ) -> tuple[str, dict]:
+        prompt = f"""
+You are a helpful assistant that answers questions using only the provided context.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer briefly and accurately.
+"""
+
+        result = self.pipe(
+            prompt,
+            max_new_tokens=128,
+        )
+
+        answer = result[0]["generated_text"].strip()
+
+        # Token counting
+        question_tokens = len(self.tokenizer.encode(question))
+        context_tokens = len(self.tokenizer.encode(context))
+        prompt_tokens = len(self.tokenizer.encode(prompt))
+        output_tokens = len(self.tokenizer.encode(answer))
+
+        usage = {
+            "question_tokens": question_tokens,
+            "context_tokens": context_tokens,
+            "prompt_tokens": prompt_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": prompt_tokens + output_tokens,
+        }
+
+        return answer, usage
